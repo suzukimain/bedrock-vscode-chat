@@ -3,6 +3,7 @@ import * as vscode from "vscode";
 import { BedrockChatProvider } from "../providers/bedrock-chat.provider";
 import { ConfigurationService } from "../services/configuration.service";
 import { AuthenticationService } from "../services/authentication.service";
+import { resolveBedrockModelIdForRequest } from "../clients/bedrock.client";
 import { convertMessages } from "../converters/messages";
 import { convertTools } from "../converters/tools";
 import { validateRequest, validateTools } from "../validation";
@@ -11,6 +12,27 @@ import { ToolCallBufferManager } from "../tool-buffer";
 
 suite("Bedrock Chat Provider Extension", () => {
 	suite("provider", () => {
+		test("resolveBedrockModelIdForRequest prefixes Anthropic base IDs", () => {
+			assert.equal(
+				resolveBedrockModelIdForRequest("us-east-1", "anthropic.claude-opus-4-7-v1:0"),
+				"us.anthropic.claude-opus-4-7-v1:0"
+			);
+		});
+
+		test("resolveBedrockModelIdForRequest preserves regional profile IDs", () => {
+			assert.equal(
+				resolveBedrockModelIdForRequest("us-east-1", "us.anthropic.claude-opus-4-7-v1:0"),
+				"us.anthropic.claude-opus-4-7-v1:0"
+			);
+		});
+
+		test("resolveBedrockModelIdForRequest leaves non-Anthropic IDs alone", () => {
+			assert.equal(
+				resolveBedrockModelIdForRequest("us-east-1", "meta.llama3-1-70b-instruct-v1:0"),
+				"meta.llama3-1-70b-instruct-v1:0"
+			);
+		});
+
 		test("prepareLanguageModelChatInformation returns array (no key -> empty)", async () => {
 			const configService = new ConfigurationService();
 			const authService = new AuthenticationService(configService);
