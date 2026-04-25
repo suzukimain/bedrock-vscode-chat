@@ -214,7 +214,7 @@
 		"download-api": "dts dev",
 		"postdownload-api": "dts main",
 		"postinstall": "npm run download-api",
-		"compile": "tsc -p ./",
+		"compile": "tsc --noEmit -p ./",
 		"package-ext": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
 		"lint": "eslint",
 		"format": "prettier --write .",

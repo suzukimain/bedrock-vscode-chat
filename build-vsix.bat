@@ -7,6 +7,7 @@ echo Installing dependencies...
 call npm ci
 if errorlevel 1 goto :error
 
+if exist out rd /s /q out
 echo Compiling extension...
 call npm run compile
 if errorlevel 1 goto :error
