@@ -17,7 +17,7 @@ export class BedrockChatParticipant {
 	): Promise<void> {
 		// 2. workspaceチェック
 		if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
-			progress.report(new vscode.LanguageModelTextPart("No workspace open. Please open a folder to use file editing tools."));
+			progress.markdown("No workspace open. Please open a folder to use file editing tools.");
 			return;
 		}
 
@@ -25,7 +25,7 @@ export class BedrockChatParticipant {
 			// Select a Bedrock model
 			const models = await vscode.lm.selectChatModels({ vendor: "bedrock", family: "bedrock" });
 			if (models.length === 0) {
-				progress.report(new vscode.LanguageModelTextPart("No Bedrock models available. Please check your configuration."));
+				progress.markdown("No Bedrock models available. Please check your configuration.");
 				return;
 			}
 			const model = models[0];
@@ -75,9 +75,9 @@ export class BedrockChatParticipant {
 
 			// History integration
 			for (const past of context.history) {
-				if (past instanceof vscode.ChatRequest) {
+				if (past instanceof vscode.ChatRequestTurn) {
 					messages.push(vscode.LanguageModelChatMessage.User(past.prompt));
-				} else if (past instanceof vscode.ChatResponse) {
+				} else if (past instanceof vscode.ChatResponseTurn) {
 					// Convert past response parts back to messages if needed
 					// For simplicity, we skip complex history here but in a real app we'd map parts
 				}
@@ -93,13 +93,13 @@ export class BedrockChatParticipant {
 
 				for await (const part of response.stream) {
 					if (part instanceof vscode.LanguageModelTextPart) {
-						progress.report(part);
+						progress.markdown(part.value);
 						responseText += part.value;
 					} else if (part instanceof vscode.LanguageModelToolCallPart) {
 						hasToolCall = true;
 						
 						// Report that we are using a tool
-						progress.report(new vscode.ChatResponseProgressPart(`Using tool: ${part.name}`));
+						progress.progress(`Using tool: ${part.name}`);
 						
 						try {
 							const result = await this.executeTool(part.name, part.input as any);
@@ -122,7 +122,7 @@ export class BedrockChatParticipant {
 
 		} catch (err) {
 			logger.error("[Bedrock Agent] Request failed", err);
-			progress.report(new vscode.LanguageModelTextPart(`Error: ${err instanceof Error ? err.message : String(err)}`));
+			progress.markdown(`Error: ${err instanceof Error ? err.message : String(err)}`);
 		}
 	}
 

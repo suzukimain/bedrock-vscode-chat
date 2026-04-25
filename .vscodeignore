@@ -19,3 +19,6 @@ install-vsix.bat
 eslint.config.mjs
 package-lock.json
 package.json.bak
+.github/**
+.prettierignore
+.vscode-test.mjs
