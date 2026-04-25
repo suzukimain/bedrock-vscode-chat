@@ -177,6 +177,20 @@
 				"managementCommand": "bedrock.manage"
 			}
 		],
+		"chatParticipants": [
+			{
+				"id": "bedrock.agent",
+				"name": "bedrock",
+				"description": "AWS Bedrock assistant with workspace access",
+				"isPreRelease": true,
+				"commands": [
+					{
+						"name": "edit",
+						"description": "Edit files in your workspace"
+					}
+				]
+			}
+		],
 		"commands": [
 			{
 				"command": "bedrock.manage",
