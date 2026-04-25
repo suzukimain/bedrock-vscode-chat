@@ -8,6 +8,25 @@ import type { AwsCredentialIdentity, Provider } from "@aws-sdk/types";
 import type { BedrockModelSummary } from "../types";
 import { logger } from "../logger";
 
+const BASE_MODEL_PREFIXES = ["us.", "eu.", "ap.", "apac.", "global."];
+
+function isRegionalInferenceProfile(modelId: string): boolean {
+	return BASE_MODEL_PREFIXES.some((prefix) => modelId.startsWith(prefix));
+}
+
+export function resolveBedrockModelIdForRequest(region: string, modelId: string): string {
+	if (isRegionalInferenceProfile(modelId)) {
+		return modelId;
+	}
+
+	if (modelId.startsWith("anthropic.")) {
+		const regionPrefix = region.split("-")[0].toLowerCase();
+		return `${regionPrefix}.${modelId}`;
+	}
+
+	return modelId;
+}
+
 /**
  * Pure AWS Bedrock API client.
  * Handles only AWS SDK interactions, no business logic or caching.
@@ -93,7 +112,10 @@ export class BedrockClient {
 			credentials,
 		});
 
-		const command = new ConverseStreamCommand(input);
+		const command = new ConverseStreamCommand({
+			...input,
+			modelId: resolveBedrockModelIdForRequest(this.region, input.modelId ?? ""),
+		});
 		const response = await client.send(command);
 
 		if (!response.stream) {
