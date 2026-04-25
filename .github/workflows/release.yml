@@ -4,6 +4,9 @@ on:
     tags:
       - 'v*'
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   package:
     runs-on: ubuntu-latest
@@ -31,13 +34,7 @@ jobs:
       - run: npm run compile
 
       - name: Package VSIX
-        run: npx @vscode/vsce package -o extension.vsix
-
-      - name: Rename VSIX to include version
-        shell: bash
-        run: |
-          set -euo pipefail
-          mv extension.vsix "bedrock-vscode-chat-${RELEASE_VERSION}.vsix"
+        run: npx @vscode/vsce package -o "bedrock-vscode-chat-${{ env.RELEASE_VERSION }}.vsix"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -63,7 +60,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          VSIX_FILE=$(ls ./*.vsix | head -n 1)
+          VSIX_FILE=$(ls bedrock-vscode-chat-*.vsix | head -n 1)
           gh release create "${{ github.ref_name }}" "$VSIX_FILE" \
             --title "Bedrock VS Code Chat ${{ github.ref_name }}" \
-            --notes "Automated release for ${{ github.ref_name }}.\n\nThis release includes the packaged VSIX artifact built from the tagged commit."
+            --notes "Automated release for ${{ github.ref_name }}.\n\nThis release includes the packaged VSIX artifact built from the tagged commit." \
+            --clobber
