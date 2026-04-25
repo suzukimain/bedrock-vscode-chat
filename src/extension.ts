@@ -3,6 +3,7 @@ import { BedrockChatProvider } from "./providers/bedrock-chat.provider";
 import { ConfigurationService } from "./services/configuration.service";
 import { AuthenticationService } from "./services/authentication.service";
 import { manageSettings } from "./commands/manage-settings";
+import { BedrockChatParticipant } from "./providers/bedrock-chat-participant";
 import { logger } from "./logger";
 
 export function activate(context: vscode.ExtensionContext) {
@@ -18,6 +19,14 @@ export function activate(context: vscode.ExtensionContext) {
 
 	const providerDisposable = vscode.lm.registerLanguageModelChatProvider("bedrock", provider);
 	context.subscriptions.push(providerDisposable, provider);
+
+	// Register Chat Participant (@bedrock)
+	const participant = new BedrockChatParticipant(configService, authService);
+	const chatParticipant = vscode.chat.createChatParticipant("bedrock.agent", (request, context, progress, token) => {
+		return participant.handleRequest(request, context, progress, token);
+	});
+	chatParticipant.iconPath = vscode.Uri.joinPath(context.extensionUri, "assets", "logo.png");
+	context.subscriptions.push(chatParticipant);
 
 	// Listen for configuration changes
 	context.subscriptions.push(
