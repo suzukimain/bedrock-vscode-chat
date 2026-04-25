@@ -48,7 +48,12 @@
 				},
 				"languageModelChatProvider.bedrock.authMethod": {
 					"type": "string",
-					"enum": ["api-key", "profile", "access-keys", "default"],
+					"enum": [
+						"api-key",
+						"profile",
+						"access-keys",
+						"default"
+					],
 					"enumDescriptions": [
 						"Use an AWS Bedrock API Key (Bearer Token)",
 						"Use an AWS profile from ~/.aws/credentials",
@@ -86,7 +91,11 @@
 				},
 				"languageModelChatProvider.bedrock.thinkingType": {
 					"type": "string",
-					"enum": ["adaptive", "enabled", "disabled"],
+					"enum": [
+						"adaptive",
+						"enabled",
+						"disabled"
+					],
 					"enumDescriptions": [
 						"Model decides when to think — recommended for Opus 4.5+ and Sonnet 4.5+",
 						"Always think with a token budget — for Opus 4.1, Sonnet 4, Sonnet 3.7",
@@ -106,7 +115,12 @@
 				},
 				"languageModelChatProvider.bedrock.thinkingEffort": {
 					"type": "string",
-					"enum": ["max", "high", "medium", "low"],
+					"enum": [
+						"max",
+						"high",
+						"medium",
+						"low"
+					],
 					"enumDescriptions": [
 						"Maximum quality — Claude uses as many tokens as needed (recommended)",
 						"High quality with moderate token usage",
@@ -132,7 +146,11 @@
 						"properties": {
 							"thinkingType": {
 								"type": "string",
-								"enum": ["adaptive", "enabled", "disabled"],
+								"enum": [
+									"adaptive",
+									"enabled",
+									"disabled"
+								],
 								"description": "Override thinking mode for this model. Overrides the global thinkingType setting."
 							},
 							"maxInputTokens": {
@@ -178,11 +196,12 @@
 	},
 	"main": "./out/extension.js",
 	"scripts": {
-		"vscode:prepublish": "npm run compile",
+		"vscode:prepublish": "npm run package-ext",
 		"download-api": "dts dev",
 		"postdownload-api": "dts main",
 		"postinstall": "npm run download-api",
 		"compile": "tsc -p ./",
+		"package-ext": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
 		"lint": "eslint",
 		"format": "prettier --write .",
 		"watch": "tsc -watch -p ./",
@@ -203,6 +222,7 @@
 		"@vscode/test-cli": "^0.0.11",
 		"@vscode/test-electron": "^2.5.2",
 		"dotenv": "^17.2.3",
+		"esbuild": "^0.28.0",
 		"eslint": "^9.13.0",
 		"prettier": "^3.1.0",
 		"typescript": "^5.9.2",

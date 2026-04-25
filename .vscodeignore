@@ -11,3 +11,11 @@ vsc-extension-quickstart.md
 **/*.map
 **/*.ts
 assets/demo.gif
+node_modules/**
+out/*.map
+*.vsix
+build-vsix.bat
+install-vsix.bat
+eslint.config.mjs
+package-lock.json
+package.json.bak
